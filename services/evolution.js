@@ -84,4 +84,20 @@ async function sendMessage(instanceName, to, text, messageId) {
     }
 }
 
-module.exports = { fetchInstances, sendMessage, registerWebhook };
+async function sendReaction(instanceName, remoteJid, messageId, reaction) {
+    const body = {
+        key: {
+            remoteJid,
+            fromMe: true,
+            id: messageId,
+        },
+        reaction,
+    };
+
+    const endpoint = `${BASE_URL}/message/sendReaction/${instanceName}`;
+    const res = await axios.post(endpoint, body, { headers });
+
+    return res.data;
+}
+
+module.exports = { fetchInstances, sendMessage, sendReaction, registerWebhook };
