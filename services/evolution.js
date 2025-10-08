@@ -19,11 +19,7 @@ async function registerWebhook(instanceName) {
                     url: process.env.WEBHOOK_GLOBAL_URL,
                     webhookByEvents: true,
                     webhookBase64: true,
-                    events: [
-                        "APPLICATION_STARTUP",
-                        "SEND_MESSAGE",
-                        "MESSAGES_UPSERT",
-                    ],
+                    events: ["MESSAGES_UPSERT"],
                 },
             },
             { headers }
@@ -60,6 +56,11 @@ async function sendMessage(instanceName, to, text, messageId) {
         const body = {
             number: String(phone),
             text,
+            quoted: {
+                key: {
+                    id: messageId,
+                },
+            },
         };
 
         const endpoint = `${BASE_URL}/message/sendText/${instanceName}`;
