@@ -4,7 +4,9 @@ const {
     sendMessage,
     registerWebhook,
     sendReaction,
+    sendList,
 } = require("./services/evolution");
+const { messages } = require("./text");
 const express = require("express");
 const app = express();
 app.use(express.json());
@@ -26,12 +28,36 @@ app.post("/webhook/wa/messages-upsert", async (req, res) => {
         return res.sendStatus(201);
     }
 
+    if (!true) {
+        const data = await sendList(
+            messageObj.instance,
+            messageObj.data.key.remoteJid,
+            {
+                sections: [
+                    {
+                        title: "titleList",
+                        rows: [
+                            {
+                                title: "titleRow",
+                                description: "descriptionRow",
+                                rowId: "rowId",
+                            },
+                        ],
+                    },
+                ],
+            },
+            messageObj.data.key.id
+        );
+        console.log("list-data ", data);
+        return res.sendStatus(200);
+    }
+
     console.log("messageObj.data.key.remoteJid", messageObj.data.key.remoteJid);
     // пример: отвечаем обратно
     await sendMessage(
         messageObj.instance,
         messageObj.data.key.remoteJid,
-        "Привет! Я бот.",
+        messages.greeting,
         messageObj.data.key.id
     );
 

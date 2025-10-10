@@ -100,4 +100,54 @@ async function sendReaction(instanceName, remoteJid, messageId, reaction) {
     return res.data;
 }
 
-module.exports = { fetchInstances, sendMessage, sendReaction, registerWebhook };
+async function sendList(instanceName, remoteJid, list, messageId) {
+    try {
+        const phone =
+            typeof remoteJid === "string" && remoteJid.includes("@")
+                ? remoteJid.split("@")[0]
+                : remoteJid;
+
+        // Ensure list has sections structure
+        const listWithSections = list.sections ? list : { sections: list };
+
+        const body = {
+            number: String(phone),
+            title: "title of list",
+            description: "description",
+            footerText: "footerText",
+            buttonText: "buttonText",
+            sections: listWithSections.sections,
+            quoted: messageId && {
+                key: { id: messageId },
+            },
+        };
+
+        const endpoint = `${BASE_URL}/message/sendList/${instanceName}`;
+        console.log("Sending list body:", JSON.stringify(body, null, 2));
+        const res = await axios.post(endpoint, body, { headers });
+
+        return res.data;
+    } catch (error) {
+        // Improve diagnostics for 400 Bad Request and others
+        const status = error.response?.status;
+        const data = error.response?.data;
+        console.error("sendButtons error status:", status);
+        if (data) {
+            console.error(
+                "sendButtons error body:",
+                JSON.stringify(data, null, 2)
+            );
+        } else {
+            console.error("sendButtons error:", error.message);
+        }
+        return null;
+    }
+}
+
+module.exports = {
+    fetchInstances,
+    sendMessage,
+    sendReaction,
+    sendList,
+    registerWebhook,
+};
